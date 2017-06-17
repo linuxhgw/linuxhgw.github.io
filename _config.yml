@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Hexo Configuration
 ## Docs: https://hexo.io/docs/configuration.html
 ## Source: https://github.com/hexojs/hexo/
@@ -71,3 +72,6 @@ deploy:
   type: git
   repository: git@github.com:linuxhgw/linuxhgw.github.io.git
   branch: master 
+=======
+theme: jekyll-theme-cayman
+>>>>>>> 15073d3b540e01577f6edba3282e910209792132
