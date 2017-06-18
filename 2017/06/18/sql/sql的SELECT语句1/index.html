@@ -8,12 +8,16 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
+  <meta name="description" content="SELECT的语句定义: SELECT * |{[DISTINCT]column|expression[alias]….} FROM table; 语法解释：语法        |解释———–|——-SELECT|是一个或者多个字段的列表*|选择所有列DISTINCT|禁止重复column.expresion |选择指定字段或者表达式alias|给所有的列不同的标题FROM table|指定包含列">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="http://yoursite.com/2017/06/18/sql/sql的SELECT语句1/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="SELECT的语句定义: SELECT * |{[DISTINCT]column|expression[alias]….} FROM table; 语法解释：语法        |解释———–|——-SELECT|是一个或者多个字段的列表*|选择所有列DISTINCT|禁止重复column.expresion |选择指定字段或者表达式alias|给所有的列不同的标题FROM table|指定包含列">
+<meta property="og:updated_time" content="2017-01-27T15:18:34.525Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo">
+<meta name="twitter:description" content="SELECT的语句定义: SELECT * |{[DISTINCT]column|expression[alias]….} FROM table; 语法解释：语法        |解释———–|——-SELECT|是一个或者多个字段的列表*|选择所有列DISTINCT|禁止重复column.expresion |选择指定字段或者表达式alias|给所有的列不同的标题FROM table|指定包含列">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -149,856 +153,7 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-sql/用组函数合计数据5" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="用组函数合计数据"><a href="#用组函数合计数据" class="headerlink" title="用组函数合计数据"></a>用组函数合计数据</h1><h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><p>组函数又被称为多行函数<br>和单行函数不同，组函数将把多行值当作一个整体进行处理</p>
-<p>组函数操作行集，给出每组的结果。比如某个组的最大值、某个组的最小值、某个组的平均值、某个组的总行数、某个组的合计、某个组的方差、某个组的标准差……</p>
-<p>定义</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span>[<span class="keyword">column</span>,] group_function(<span class="keyword">column</span>), ...</div><div class="line"><span class="keyword">FROM</span></div><div class="line"><span class="keyword">table</span>[<span class="keyword">WHERE</span> condition]</div><div class="line">[<span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">column</span>]</div><div class="line">[<span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">column</span>];</div></pre></td></tr></table></figure>
-<p>AVG([distinct|all]n) 求取记录集中的平均值。</p>
-<p>SUM([distinct|all] col) 取指定列所在分组序列的值的和并返回。</p>
-<p>MAX (col) OVER (analytic_clause) 获取分组序列中的最大值。<br>MIN (col) OVER (analytic_clause) 获取分组序列中的最小值。</p>
-<p>COUNT([distinct|all]col) 该函数返回查询涉及到的记录行数。COUNT 函数有三中格式： COUNT(*)、COUNT(expr)、COUNT(DISTINCT expr)</p>
-<h6 id="解释-1"><a href="#解释-1" class="headerlink" title="解释"></a>解释</h6><p>​    COUNT(<em>) 返回表中满足 SELECT 语句标准的行数，包括重复行，包括有空值列的行。如果 WHERE 子句包括在 SELECT 语句中，COUNT(</em>) 返回满足 WHERE 子句条件的行数。对比，COUNT(expr) 返回在列中的由 expr 指定的非空值的数。COUNT (DISTINCT expr) 返回在列中的由 expr 指定的唯一的非空值的数。</p>
-<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>所有组函数忽略列中的空值。在下面的例子中，平均值只基于表中的那些COMMISSION_PCT 列的值有效的行的计算。NVL 函数强制组函数包括空值</p>
-<h3 id="GROUP-BY-子句"><a href="#GROUP-BY-子句" class="headerlink" title="GROUP BY 子句"></a>GROUP BY 子句</h3><p>就是根据指定列进行分组</p>
-<p>可以用ORDER BY 指定不同的排序顺序，但只能用组函数或分组列</p>
-<p>GROUP BY 子句指定行怎样被分组。行用部门号分组，所以 AVG 函数被应用于薪水列，以计算每个部门的平均薪水。</p>
-<p>当使用 GROUP BY 子句时，确保在 SELECT 列表中的所有没有包括在组函数中的列必须在 GROUP BY 子句中。</p>
-<p>如果在 SELECT 子句中包含了组函数，就不能选择单独的结果，除非单独的列出现在 GROUP BY 子句中。</p>
-<p>行以包含在 GROUP BY 列表中的字段的升序排序。</p>
-<h3 id="HAVING-子句"><a href="#HAVING-子句" class="headerlink" title="HAVING 子句"></a>HAVING 子句</h3><p>约束分组结果: HAVING 子句，行被分组，应用组函数，匹配HAVING 子句的组被显示</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Department_Id, <span class="keyword">Max</span>(Salary)</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Group</span> <span class="keyword">By</span> Department_Id</div><div class="line"><span class="keyword">Having</span> <span class="keyword">Max</span>(Salary) &gt; <span class="number">10000</span>;</div></pre></td></tr></table></figure>
-<p>Oracle 服务器按下面的顺序求子句的值：</p>
-<ol>
-<li>如果语句包含一个 WHERE 子句，服务器建立侯选行。</li>
-<li>服务器确定在 GROUP BY 子句中指定的组。</li>
-<li>HAVING 子句进一步约束不满足在 HAVING 子句中分组标准的结果分组。</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/用组函数合计数据5/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/条件和排序2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="条件和排序"><a href="#条件和排序" class="headerlink" title="条件和排序"></a>条件和排序</h1><h2 id="用选择限定行"><a href="#用选择限定行" class="headerlink" title="用选择限定行"></a>用选择限定行</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>SELECT * |{[DISTINCT] column | expression [alias] ,… }FROM table [WHEREcondition(s)];</p>
-<h4 id="解释："><a href="#解释：" class="headerlink" title="解释："></a>解释：</h4><table>
-<thead>
-<tr>
-<th>语句</th>
-<th style="text-align:center">解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>WHERE</td>
-<td style="text-align:center">限制查询满足条件的行</td>
-</tr>
-<tr>
-<td>condition</td>
-<td style="text-align:center">由列名、表达式、常数和比较操作组成</td>
-</tr>
-</tbody>
-</table>
-<h4 id="例如："><a href="#例如：" class="headerlink" title="例如："></a>例如：</h4><p>Select Employee_Id, Last_Name, Job_Id, Department_Id<br>From Employees Es<br>Where Es.Department_Id = 100</p>
-<h3 id="条件中使用字符串和日期"><a href="#条件中使用字符串和日期" class="headerlink" title="条件中使用字符串和日期"></a>条件中使用字符串和日期</h3><p>在WHERE子句中字符串和日期必须包含在单引号 (‘ ’) 中。但是，数字常数不应该包含在单引号中。</p>
-<h3 id="比较条件"><a href="#比较条件" class="headerlink" title="比较条件"></a>比较条件</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">符号</th>
-<th style="text-align:center">解释</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">=</td>
-<td style="text-align:center">等于</td>
-</tr>
-<tr>
-<td style="text-align:center">&gt;</td>
-<td style="text-align:center">大于</td>
-</tr>
-<tr>
-<td style="text-align:center">&gt;=</td>
-<td style="text-align:center">大于等于</td>
-</tr>
-<tr>
-<td style="text-align:center">&lt;</td>
-<td style="text-align:center">小于</td>
-</tr>
-<tr>
-<td style="text-align:center">&lt;=</td>
-<td style="text-align:center">小于等于</td>
-</tr>
-<tr>
-<td style="text-align:center">&lt;&gt;</td>
-<td style="text-align:center">不等于</td>
-</tr>
-<tr>
-<td style="text-align:center">!=</td>
-<td style="text-align:center">不等于</td>
-</tr>
-<tr>
-<td style="text-align:center">^=</td>
-<td style="text-align:center">不等于</td>
-</tr>
-<tr>
-<td style="text-align:center">BETWEEN…AND…</td>
-<td style="text-align:center">在两个值之间(包含)</td>
-</tr>
-<tr>
-<td style="text-align:center">IN(set)</td>
-<td style="text-align:center">匹配一个任意值列表</td>
-</tr>
-<tr>
-<td style="text-align:center">LIKE</td>
-<td style="text-align:center">匹配一个字符模板</td>
-</tr>
-<tr>
-<td style="text-align:center">IS NULL</td>
-<td style="text-align:center">是一个空值</td>
-</tr>
-<tr>
-<td style="text-align:center">IS NOT NULL</td>
-<td style="text-align:center">不是一个空值</td>
-</tr>
-</tbody>
-</table>
-<h4 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h4><h4 id="IN-IN条件也就是成员条件。"><a href="#IN-IN条件也就是成员条件。" class="headerlink" title="IN IN条件也就是成员条件。"></a>IN IN条件也就是成员条件。</h4><h5 id="例如"><a href="#例如" class="headerlink" title="例如"></a>例如</h5><ol>
-<li><p>Select Employee_Id, Last_Name, Salary, Manager_Id<br>From Employees<br>Where Manager_Id In (100, 101, 201);</p>
-</li>
-<li><p>Select Employee_Id, Manager_Id, Department_Id<br>From Employees<br>Where Last_Name In (‘Hartstein’, ‘Vargas’);</p>
-</li>
-</ol>
-<h4 id="LIKE-不知道要搜索的确切的值，字符模板匹配运算涉及通配符查询。有两个符号-和-可以用来构造搜索串。"><a href="#LIKE-不知道要搜索的确切的值，字符模板匹配运算涉及通配符查询。有两个符号-和-可以用来构造搜索串。" class="headerlink" title="LIKE 不知道要搜索的确切的值，字符模板匹配运算涉及通配符查询。有两个符号 % 和 _ 可以用来构造搜索串。"></a>LIKE 不知道要搜索的确切的值，字符模板匹配运算涉及通配符查询。有两个符号 % 和 _ 可以用来构造搜索串。</h4><h5 id="例如-1"><a href="#例如-1" class="headerlink" title="例如"></a>例如</h5><ol>
-<li><p>Select First_Name<br>From Employees<br>Where First_Name Like ‘S%’;<br>结果<br>FIRST_NAME<br>Steven<br>Shelli<br>Sigal<br>Shanta<br>Steven<br>Stephen</p>
-</li>
-<li><p>Select Last_Name<br>From Employees<br>Where Last_Name Like ‘_o%’;<br>结果<br>LAST_NAME<br>Kochhar<br>Lorentz<br>Popp<br>Tobias<br>Colmenares</p>
-</li>
-</ol>
-<p>ps :搜索实际的%和<em> 符号，使用ESCAPE标识符可以搜索实际的%和</em>符号。<br>Select Employee_Id, Last_Name, Job_Id<br>From Employees<br>Where Job<em>Id Like ‘%SA\</em>%AN’ Escape ‘\’;<br>结果<br>编号|名字|工号<br>—|—|—<br>EMPLOYEE_ID |LAST_NAME| JOB_ID<br>145|Russell| SA_MAN</p>
-<h3 id="逻辑条件"><a href="#逻辑条件" class="headerlink" title="逻辑条件"></a>逻辑条件</h3><p>当所有条件的结果为真时，返回行。SQL的三个逻辑运算符是：<br>AND 、OR 、NOT</p>
-<h3 id="优先规则"><a href="#优先规则" class="headerlink" title="优先规则"></a>优先规则</h3><table>
-<thead>
-<tr>
-<th>序号</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>算术运算</td>
-</tr>
-<tr>
-<td>2</td>
-<td>连字操作</td>
-</tr>
-<tr>
-<td>3</td>
-<td>比较操作</td>
-</tr>
-<tr>
-<td>4</td>
-<td>IS[NOT]NULL, LIKE, [NOT]IN5</td>
-</tr>
-<tr>
-<td>5</td>
-<td>[NOT] BETWEEN</td>
-</tr>
-<tr>
-<td>6</td>
-<td>NOT逻辑条件</td>
-</tr>
-<tr>
-<td>7</td>
-<td>AND逻辑条件</td>
-</tr>
-<tr>
-<td>8</td>
-<td>OR逻辑条件</td>
-</tr>
-</tbody>
-</table>
-<p>使用圆括号强制优先权</p>
-<h2 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h2><h5 id="定义："><a href="#定义：" class="headerlink" title="定义："></a>定义：</h5><p>SELECT expr<br>FROM table<br>[WHERE condition(s)]<br>[ORDER BY {column, expr} [ASC|DESC]];</p>
-<h5 id="解释：-1"><a href="#解释：-1" class="headerlink" title="解释："></a>解释：</h5><p>ORDER BY 指定排序显示返回的行，ASC 以升序排序行 (这是默认排序)，DESC 以降序排序行</p>
-<h5 id="eg："><a href="#eg：" class="headerlink" title="eg："></a>eg：</h5><p>Select Last_Name, Job_Id, Department_Id, Hire_Date<br>From Employees<br>Order By Hire_Date Desc;</p>
-<h5 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h5><p>数据的默认排序，默认的排序顺序是升序：<br>对于数字值，小的只值在前面显示，例如，1–999。<br>对于日期，早的日期在前面显示，例如，01-JAN-92 在 01-JAN-95 。<br>对于字符值，依字母顺序显示，例如，A第一，Z最后。<br>对于空值，升序排序时显示在最后，降序排序时显示在最前面。</p>
-<ul>
-<li><p>能够以SELECT列表中的列号排序<br>例如：<br>Select Last_Name, Salary<br>From Employees<br>Order By 2 Desc;</p>
-</li>
-<li><p>可以用别名排序</p>
-</li>
-</ul>
-<h3 id="多行排序"><a href="#多行排序" class="headerlink" title="多行排序"></a>多行排序</h3><p>Select Last_Name, Department_Id, Salary<br>From Employees<br>Order By Department_Id, Salary Desc;</p>
-<h6 id="解释：-2"><a href="#解释：-2" class="headerlink" title="解释："></a>解释：</h6><p>首先按照Department_Id排序，在Department_Id相同的基础上，按照Salary排序</p>
-<h5 id="ps："><a href="#ps：" class="headerlink" title="ps："></a>ps：</h5><ul>
-<li>可以用SELECT没有选择的列去进行列排序<br>Select Last_Name, Salary<br>From Employees<br>Order By Department_Id, Salary Desc;</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/条件和排序2/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/数据库学习的第一天" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>#数据库</p>
-<h2 id="1-sql是面向集合的描述性非过程化的语言"><a href="#1-sql是面向集合的描述性非过程化的语言" class="headerlink" title="1. sql是面向集合的描述性非过程化的语言"></a>1. sql是面向集合的描述性非过程化的语言</h2><p>sql的优点有：</p>
-<ul>
-<li>简单易学</li>
-<li>维护方便</li>
-<li>功能强大</li>
-<li>效率高</li>
-</ul>
-<p>sql的缺点</p>
-<ul>
-<li>大多语句是独立的，与上下文无关，而大部分的应用是完整的过程</li>
-</ul>
-<h2 id="2-sql的分类"><a href="#2-sql的分类" class="headerlink" title="2. sql的分类"></a>2. sql的分类</h2><h3 id="sql语言共分为三类："><a href="#sql语言共分为三类：" class="headerlink" title="sql语言共分为三类："></a>sql语言共分为三类：</h3><p>数据操作语言dml<br>数据定义语言ddl<br>数据控制语言dcl</p>
-<ol>
-<li><p>数据操作语言dml<br>插入INSERT<br>更新UPDATE<br>删除DELETE<br>选择SELECT</p>
-</li>
-<li><p>数据定义语言ddl<br>ddl就是来创建数据库中的对象<br>eg：<br>| 语句名称            | 含义     |<br>| ————— | —— |<br>| CREATE DATABASE | 创建数据库  |<br>| CREATE TABLE    | 创建表    |<br>| DROP TABLE      | 删除表    |<br>| ALTER TABLE     | 修改表的结构 |<br>| CREATE VIEW     | 创建视图   |<br>| DROP VIEW       | 删除视图   |<br>| CREATE INDEX    | 创建引索   |<br>| DROP INDEX      | 删除引索   |</p>
-</li>
-<li><p>数据控制语言dcl<br>dcl是用来授权或回收访问数据库的某种特权，对数据库实时监控<br>| 语句名称                             | 含义     |<br>| ——————————– | —— |<br>| <strong>GRANT</strong>                        | 授权     |<br>| <strong>REVOKE</strong>                       | 取消权限   |<br>| <strong>ROLLBACK[WORK]TO[SVAEPOINT]:</strong> | 回退到某一点 |<br>| <strong>ROLLBACK</strong>                     | 回滚     |<br>| <strong>COMMIT[WORK]</strong>                 | 提交     |</p>
-</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">提交的类型语句名称</th>
-<th style="text-align:center">语句</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">- 显式提交</td>
-<td style="text-align:center"><strong> COMMIT</strong></td>
-</tr>
-<tr>
-<td style="text-align:center">- 隐式提交</td>
-<td style="text-align:center"><strong>ALTER，AUDIT，COMMENT，CONNECT，DISCONNECT，DROP，EXIT，GRANT，NOAUDIT，QUIT，RENAME</strong></td>
-</tr>
-<tr>
-<td style="text-align:center">- 自动提交</td>
-<td style="text-align:center"><strong>AUTOCOMMIT ON</strong></td>
-</tr>
-</tbody>
-</table>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/数据库学习的第一天/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/操作数据7" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="操作数据"><a href="#操作数据" class="headerlink" title="操作数据"></a>操作数据</h1><p>数据操作语言（dml）即是添加，更新，合并，或者删除</p>
-<p>从oracle7,2开始，就可以用一个子查询代替update语句中的表名</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span> <span class="keyword">table</span> [(<span class="keyword">colum</span>,[,colum...])] <span class="keyword">values</span> (<span class="keyword">value</span>[,value...]);</div></pre></td></tr></table></figure>
-<p>对于number的数据类型，如果用了单引号，可能会发生数字值的转换</p>
-<h6 id="例如"><a href="#例如" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span> Departments</div><div class="line">(Department_Id, Department_Name, Manager_Id, Location_Id)</div><div class="line"><span class="keyword">Values</span></div><div class="line">(<span class="number">70</span>, <span class="string">'Public Relations'</span>, <span class="number">100</span>, <span class="number">1700</span>);</div></pre></td></tr></table></figure>
-<p>隐式插入空值：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span> Departments</div><div class="line">(Department_Id, Department_Name)</div><div class="line"><span class="keyword">Values</span></div><div class="line">(<span class="number">30</span>, <span class="string">'Purchasing'</span>);</div></pre></td></tr></table></figure>
-<p>显式插入空值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span> Departments <span class="keyword">Values</span> (<span class="number">100</span>, <span class="string">'Finance'</span>, <span class="literal">Null</span>, <span class="literal">Null</span>);</div></pre></td></tr></table></figure>
-<p>INSERT的时候可能出现如下的错误：<br>对于NOT NULL列缺少强制的值，重复值违反了唯一性约束，违反外键约束，违反CHECK约束，数据类型不匹配，值的宽度超过了列的限制。</p>
-<p>可以插入系统函数，可以插入指定日期（To_Date(‘FEB 3, 1999’, ‘MON DD, YYYY’)）</p>
-<p>可以插入可输入的变量</p>
-<h2 id="从另外一个表复制"><a href="#从另外一个表复制" class="headerlink" title="从另外一个表复制"></a>从另外一个表复制</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">table</span> [<span class="keyword">column</span> (, <span class="keyword">column</span>) ] subquery;</div></pre></td></tr></table></figure>
-<h6 id="例如-1"><a href="#例如-1" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span> Sales_Reps</div><div class="line">(<span class="keyword">Id</span>, <span class="keyword">Name</span>, Salary, Commission_Pct)</div><div class="line"><span class="keyword">Select</span> Employee_Id, Last_Name, Salary, Commission_Pct</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Job_Id <span class="keyword">Like</span> <span class="string">'%REP%'</span>;</div><div class="line"></div><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span> Departments</div><div class="line"><span class="keyword">Select</span> <span class="number">999</span> <span class="string">'TEST_PART'</span>, (<span class="keyword">Select</span> <span class="number">400</span> <span class="keyword">From</span> Dual), <span class="number">4422</span> <span class="keyword">From</span> Dual;</div><div class="line"></div><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span></div><div class="line">(<span class="keyword">Select</span> Employee_Id,</div><div class="line">Last_Name, Email, Hire_Date,</div><div class="line">Job_Id, Salary, Department_Id</div><div class="line"> <span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Department_Id = <span class="number">50</span>)</div><div class="line"><span class="keyword">Values</span></div><div class="line">(<span class="number">99999</span>, <span class="string">'Taylor'</span>,</div><div class="line"><span class="string">'DTAYLOR'</span>, <span class="keyword">To_Date</span>(<span class="string">'07-6月-1999'</span>, <span class="string">'DD-MON-RR'</span>),</div><div class="line"><span class="string">'ST_CLERK'</span>, <span class="number">5000</span>, <span class="number">50</span>);</div></pre></td></tr></table></figure>
-<h2 id="update"><a href="#update" class="headerlink" title="update"></a>update</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">UPDATE</span> <span class="keyword">table</span></div><div class="line"><span class="keyword">SET</span> <span class="keyword">column</span>= <span class="keyword">value</span>[, <span class="keyword">column</span> = <span class="keyword">value</span>, ...]</div><div class="line">[<span class="keyword">WHERE</span> condition];</div></pre></td></tr></table></figure>
-<h3 id="用子查询更新两列"><a href="#用子查询更新两列" class="headerlink" title="用子查询更新两列"></a>用子查询更新两列</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Update</span> Employees <span class="keyword">set</span> Job_Id = (<span class="keyword">Select</span> Job_Id</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Employee_Id = <span class="number">205</span>),</div><div class="line">Salary = (<span class="keyword">Select</span> Salary <span class="keyword">From</span> Employees <span class="keyword">Where</span> Employee_Id = <span class="number">205</span>)</div><div class="line"><span class="keyword">Where</span> Employee_Id = <span class="number">114</span>;</div></pre></td></tr></table></figure>
-<h3 id="更新基于另一个表的行"><a href="#更新基于另一个表的行" class="headerlink" title="更新基于另一个表的行"></a>更新基于另一个表的行</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Update</span> Copy_Emp <span class="keyword">set</span> Department_Id = (<span class="keyword">Select</span> Department_Id</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Employee_Id = <span class="number">100</span>)</div><div class="line"><span class="keyword">Where</span> Job_Id = (<span class="keyword">Select</span> Job_Id <span class="keyword">From</span> Employees <span class="keyword">Where</span> Employee_Id = <span class="number">200</span>);</div></pre></td></tr></table></figure>
-<h3 id="更新导致完整性约束报错"><a href="#更新导致完整性约束报错" class="headerlink" title="更新导致完整性约束报错"></a>更新导致完整性约束报错</h3><p>“ORA-00001: 违反唯一约束条件(TEST.EMP_EMP_ID_PK)”    </p>
-<h6 id="例如-2"><a href="#例如-2" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Update</span> Employees <span class="keyword">Set</span> Employee_Id = <span class="number">100</span> <span class="keyword">Where</span> Employee_Id = <span class="number">101</span>;</div><div class="line">员工号101号是有的</div></pre></td></tr></table></figure>
-<p>“ORA-02291: 违反完整性约束条件(TEST.EMP_DEPT_FK)-未找到父项关键字”</p>
-<h6 id="例如-3"><a href="#例如-3" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Update</span> Employees <span class="keyword">Set</span> Department_Id = <span class="number">55</span> <span class="keyword">Where</span> Department_Id = <span class="number">110</span>;</div><div class="line">部门号55在父表DEPARTMENTS中不存在</div></pre></td></tr></table></figure>
-<p>主键是该表中的唯一约束，不能重复，外键是该表中的字段与另外一个表的主键字段名相同的情况下设置的一种约束，外键约束不满足的时候，数据也无法更新或者插入。</p>
-<h2 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h2><h3 id="定义-1"><a href="#定义-1" class="headerlink" title="定义"></a>定义</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">delete</span>[<span class="keyword">from</span>]<span class="keyword">table</span> [<span class="keyword">where</span> Econdition];</div></pre></td></tr></table></figure>
-<p>DELETE语句执行前没有确认提示，但是，删除操作直到数据处理事务被提交之前不会被持久化，因此，如果你做错了，在提交(commit)之前，可以用ROLLBACK语句撤消删除操作。但是如果提交了，那只能通过恢复手段来取回删除掉的数据了。</p>
-<h6 id="例如-4"><a href="#例如-4" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Delete</span> <span class="keyword">From</span> Departments <span class="keyword">Where</span> Department_Id <span class="keyword">In</span> (<span class="number">30</span>, <span class="number">40</span>);</div></pre></td></tr></table></figure>
-<p>如果你遗漏了WHERE子句，在表中的所有行都被删除。下面的例子从COPY_EMP表中删除所有的行，因为没有指定WHERE子句。</p>
-<p>切记：在提交DELETE之前，多看一眼，自己到底有没有加条件，条件是否是唯一约束，是否真的是要删除条件约束的数据。</p>
-<h3 id="删除基于另一个表的行"><a href="#删除基于另一个表的行" class="headerlink" title="删除基于另一个表的行"></a>删除基于另一个表的行</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Delete</span> <span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Department_Id =</div><div class="line">(<span class="keyword">Select</span> Department_Id</div><div class="line"><span class="keyword">From</span> Departments</div><div class="line"><span class="keyword">Where</span> Department_Name <span class="keyword">Like</span> <span class="string">'%Public%'</span>);</div></pre></td></tr></table></figure>
-<h3 id="删除数据导致的完整性约束"><a href="#删除数据导致的完整性约束" class="headerlink" title="删除数据导致的完整性约束"></a>删除数据导致的完整性约束</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> departments <span class="keyword">WHERE</span> department_id = <span class="number">60</span>;</div><div class="line">ORA-02292  ：</div><div class="line">违反了完整性约束条件</div><div class="line">因为department_id在employee中是外键，employee相当于是department的子表，删除的父记录有子记录，那么就会有一个ORA-02292</div></pre></td></tr></table></figure>
-<p>如果使用了引用完整性约束，当你试图删除一行时，你可能收到一个Oracle服务器错误信息。但是，如果引用完整性约束包含了ON DELETE CASCADE选项，那么，可以删除行，并且所有相关的子表记录都被删除。</p>
-<h3 id="显式默认值"><a href="#显式默认值" class="headerlink" title="显式默认值"></a>显式默认值</h3><p>显式默认特性，我们能够用DEFAULT关键字作为一个列值，该列要求一个默认值，该特性允许用户控制在什么地方和什么时候默认值应该被提供给数据，如果不存在默认值，就用空值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Insert</span> <span class="keyword">Into</span> Departments</div><div class="line">(Department_Id, Department_Name, Manager_Id)</div><div class="line"><span class="keyword">Values</span></div><div class="line">(<span class="number">300</span>, <span class="string">'Engineering'</span>, <span class="keyword">Default</span>);</div><div class="line"><span class="keyword">Update</span> Departments <span class="keyword">Set</span> Manager_Id = <span class="keyword">Default</span> <span class="keyword">Where</span> Department_Id = <span class="number">10</span>;</div></pre></td></tr></table></figure>
-<p>Merge语句</p>
-<p>使用该语句，你可以有条件地更新或插入行到表中，这样能避免多重UPDATE语句。是执行对目的表的更新操作还是执行对目的表的插入操作，取决于基于ON子句中的条件。</p>
-<p>MERGE语句确定性的。在同一个MERGE语句中，你不能多次更新目的表中相同的行。</p>
-<p>一个可供选择近似方法是用PL/SQL循环和多重DML语句，然而，MERGE语句易于使用，并且作为一条单个的SQL语句会更简单。</p>
-<h4 id="定义-2"><a href="#定义-2" class="headerlink" title="定义"></a>定义</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">MERGE</span> <span class="keyword">INTO</span> table_nametable_alias</div><div class="line"><span class="keyword">USING</span> (<span class="keyword">table</span>|<span class="keyword">view</span>|sub_query) <span class="keyword">alias</span></div><div class="line"><span class="keyword">ON</span> (<span class="keyword">join</span> condition)</div><div class="line"><span class="keyword">WHEN</span> <span class="keyword">MATCHED</span> <span class="keyword">THEN</span></div><div class="line"><span class="keyword">UPDATE</span> <span class="keyword">SET</span></div><div class="line">col1 = col_val1,</div><div class="line">col2 = col2_val</div><div class="line"><span class="keyword">WHEN</span> <span class="keyword">NOT</span> <span class="keyword">MATCHED</span> <span class="keyword">THEN</span></div><div class="line"><span class="keyword">INSERT</span> (column_list)</div><div class="line"><span class="keyword">VALUES</span> (column_values);</div></pre></td></tr></table></figure>
-<h6 id="例如-5"><a href="#例如-5" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Merge</span> <span class="keyword">Into</span> Copy_Emp c</div><div class="line"><span class="keyword">Using</span> Employees e</div><div class="line"><span class="keyword">On</span> (c.Employee_Id = e.Employee_Id)</div><div class="line"><span class="keyword">When</span> <span class="keyword">Matched</span> <span class="keyword">Then</span></div><div class="line"><span class="keyword">Update</span></div><div class="line"><span class="keyword">Set</span> c.First_Name = e.First_Name,</div><div class="line">c.Last_Name = e.Last_Name,</div><div class="line">c.Email = e.Email,</div><div class="line">c.Phone_Number = e.Phone_Number,</div><div class="line">c.Hire_Date = e.Hire_Date,</div><div class="line">c.Job_Id = e.Job_Id,</div><div class="line">c.Salary = e.Salary,</div><div class="line">c.Commission_Pct = e.Commission_Pct,</div><div class="line">c.Manager_Id = e.Manager_Id,</div><div class="line">c.Department_Id = e.Department_Id</div><div class="line"><span class="keyword">When</span> <span class="keyword">Not</span> <span class="keyword">Matched</span> <span class="keyword">Then</span></div><div class="line"><span class="keyword">Insert</span></div><div class="line"><span class="keyword">Values</span></div><div class="line">(e.Employee_Id,</div><div class="line">e.First_Name,</div><div class="line">e.Last_Name,</div><div class="line">e.Email,</div><div class="line">e.Phone_Number,</div><div class="line">e.Hire_Date,</div><div class="line">e.Job_Id,</div><div class="line">e.Salary,</div><div class="line">e.Commission_Pct,</div><div class="line">e.Manager_Id,e.Department_Id);</div></pre></td></tr></table></figure>
-<h3 id="COMMIT和ROLLBACK语句"><a href="#COMMIT和ROLLBACK语句" class="headerlink" title="COMMIT和ROLLBACK语句"></a>COMMIT和ROLLBACK语句</h3><p>什么时候开始和结束一个事务?<br>当遇到第一个DML语句一个事务开始。<br>当下面的情况发生时，事务结束：<br>一个COMMIT或ROLLBACK语句被发布</p>
-<p>在事务中所做的每一个数据改变在事务被提交之前都是临时的。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/操作数据7/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/学习笔记" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>oracle是最大的软件提供商之一</p>
-<p>oracle8、oracle8i，，“i”表示Internet，表示进军网络</p>
-<p>9i表示8i的稳定版本</p>
-<p>10 g是适用了网格计算，分布式访问性能</p>
-<p>11g是10g的稳定版本</p>
-<p>ed +文件名称</p>
-<p>想要执行文件   @文件名</p>
-<p>切换用户</p>
-<p>Conn 用户名/密码【AS Sysdba】</p>
-<p>emp 的完整名称的：用户名.表名称</p>
-<p>HOST可以调用系统命令</p>
-<p> Set PageSize 30</p>
-<p> Set LineSize 300</p>
-<p>Number（2）最多两个数字</p>
-<p>Varchar2（14）最多14 个字符</p>
-<p>NUmber（7，2）小数点后面最多两位，整数最多5位</p>
-<p>COL 列名称 For A长度;</p>
-<p>select 不能查询行</p>
-<p>Distinct 禁止重复</p>
-<p>select 查询常量  字符就用单引号，数字就直接写</p>
-<p>||表示合并两个列</p>
-<p>！=也可以相当于&lt;&gt;</p>
-<p>Between 01 - 1月 -1981 And 31 - 12月 -1981</p>
-<p>空是个不确定的内容</p>
-<p>IS NOT NULL 不是空，这个判断空的标准</p>
-<p>IN 类似Between and，，但是between and是大的范围  在指定查询中，IN是操作是最短的</p>
-<p>NOT IN（NULL）；这个不能查询</p>
-<p>NOT IN是为了查询部分的数据，但是没有某些数据不可能是空，所以就是查询全部数据</p>
-<p>select 是第三个执行，第一个是FROM，第二个是where，第四个是order by </p>
-<p>asc是升序，desc是 降序</p>
-<p>order by  字段 asc|desc</p>
-<p> 单行函数格式“返回值 函数名称（参数）”</p>
-<p>字符串，数值，日期，转换，通用函数</p>
-<p>upper （列|字符串）字符串变大写</p>
-<p>lower 变小写</p>
-<p>initcap开头大写</p>
-<p>（数字）Length 长度</p>
-<p>substr（列|字符串，开始索引，长度） 截取字符串</p>
-<p>substr（列|字符串，开始索引） 截取字符串到结尾</p>
-<p>replace（列|字符串，旧字符，新字符）替换</p>
-<p>有一个不需要查询表的查询表dual（虚拟表）；</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span> <span class="keyword">UPPER</span>（‘hello’）<span class="keyword">FROM</span> dual；</div></pre></td></tr></table></figure>
-<p>where ename =UPPer(‘&amp;input’)</p>
-<p>可以将输入的字符串都转换成大写</p>
-<p> 程序的索引都是从0 开始，oracle是从1开始，你写成0 ，他也是认为是1</p>
-<p>索引可以为负数（只有oracle有）</p>
-<p>round (列|数字[,小数位])可以四舍五入，可以设置保留的小数位</p>
-<p>​    没有写小数保留位就，是整数</p>
-<p>​    可以用负数，就是整数位的四舍五入</p>
-<p>trunc（列|数字[,小数位]）可以截取数据，不进位</p>
-<p>mod（20,3）求模</p>
-<p>round都是表示四舍五入</p>
-<p>想知道任何日期一定要知道当前日期</p>
-<p>伪列sysdate，systimestamp</p>
-<p>sysdate有日期和时间，但是只显示日期</p>
-<p>systimestamp一个具体的时间瞬间</p>
-<p> 由于每个月的天数不同，所以直接加天，不准</p>
-<p>计算年或月用天数来计算一定是不准确的</p>
-<p>用函数ADD_MONTHS（），MONTHS——BETWEEN（）LAST_DAY（）NEXT_DAY（）</p>
-<p>NEXT_DAY（时间，“星期三”）表该时间的下个星期三</p>
-<p> 计算天数</p>
-<p>ADD_MONTHS(hiredate,MONTHS_BETWEEN(SYSDATE,hiredate))这个是计算年和月</p>
-<p>sysdate-年和月就是天数</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/学习笔记/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/子查询6" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h1><p>一个查询被嵌套在另一个查询中，就是子子查询<br>子查询作用巨大且非常常用<br>子查询在很多情况下可以代替自连接<br>相比自连接，子查询的语句语法更清晰</p>
-<h6 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> select_list</div><div class="line"><span class="keyword">FROM</span> <span class="keyword">table</span></div><div class="line"><span class="keyword">WHERE</span> expr <span class="keyword">operator</span></div><div class="line">(<span class="keyword">SELECT</span> select_list <span class="keyword">FROM</span> <span class="keyword">table</span> <span class="keyword">where</span> expr <span class="keyword">operator</span>);</div></pre></td></tr></table></figure>
-<p>子查询通常涉及一个嵌套的 SELECT、子SELECT 或内 SELECT 语句。字查询通常执行一次。并且它的输出被用于完成主或外查询的查询条件。</p>
-<h6 id="例如"><a href="#例如" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Last_Name,e.employee_id</div><div class="line"><span class="keyword">From</span> Employees e</div><div class="line"><span class="keyword">Where</span> Salary &gt; (<span class="keyword">Select</span> Salary <span class="keyword">From</span> Employees <span class="keyword">Where</span> Last_Name = <span class="string">'Abel'</span>);</div></pre></td></tr></table></figure>
-<p>结果</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">LAST_NAME   EMPLOYEE_ID</div><div class="line">King          100</div><div class="line">Kochhar   	  101</div><div class="line">De Haan  	  102</div><div class="line">Greenberg	  108</div></pre></td></tr></table></figure>
-<h3 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h3><p>一个子查询必须放在括号里<br>将查询放在比较条件的右边<br>子查询可以使用的比较条件<br>子查询可以多次执行</p>
-<h3 id="单行子查询"><a href="#单行子查询" class="headerlink" title="单行子查询"></a>单行子查询</h3><p>单行子查询：子查询只返回一行<br>针对单行子查询的条件和普通条件一样<br>单行子查询中使用HAVING<br>可以把单行子查询想像作一个可变的值。它和一个单一值没什么区别</p>
-<h6 id="例如-1"><a href="#例如-1" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Last_Name, Job_Id, Salary</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Job_Id = (<span class="keyword">Select</span> Job_Id <span class="keyword">From</span> Employees <span class="keyword">Where</span> Employee_Id = <span class="number">141</span>)</div><div class="line"><span class="keyword">And</span> Salary &gt; (<span class="keyword">Select</span> Salary <span class="keyword">from</span> Employees <span class="keyword">where</span> Employee_Id = <span class="number">143</span>);</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">Select</span> Department_Id, <span class="keyword">Min</span>(Salary)</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Group</span> <span class="keyword">By</span> Department_Id</div><div class="line"><span class="keyword">Having</span> <span class="keyword">Min</span>(Salary) &gt; (<span class="keyword">Select</span> <span class="keyword">Min</span>(Salary)</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Department_Id = <span class="number">50</span>);</div></pre></td></tr></table></figure>
-<p>因为针对单行子查询的条件只是普通的条件，没有特别的形式，因此单行子查询不能返回多行，否则会报出如下错误：<br>ORA-01427: 单行子查询返回多个行</p>
-<h6 id="例如-2"><a href="#例如-2" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Employee_Id, Last_Name</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Salary = (<span class="keyword">Select</span> <span class="keyword">Min</span>(Salary) <span class="keyword">From</span> Employees <span class="keyword">Group</span> <span class="keyword">By</span> Department_Id);</div></pre></td></tr></table></figure>
-<p>因为</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(<span class="keyword">Select</span> <span class="keyword">Min</span>(Salary) <span class="keyword">From</span> Employees <span class="keyword">Group</span> <span class="keyword">By</span> Department_Id);</div></pre></td></tr></table></figure>
-<p>是有多行的结果</p>
-<p>解决方法</p>
-<p>如果是普通的查询，为了查询出结果可以将“＝”改为“IN”</p>
-<p>如果是系统报错，就要查看原因了。<br>通常还会产生的一个错误是子查询并没有返回预期的行：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Last_Name, Job_Id</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Job_Id = (<span class="keyword">Select</span> Job_Id <span class="keyword">From</span> Employees <span class="keyword">Where</span> Last_Name = <span class="string">'Haas'</span>);</div></pre></td></tr></table></figure>
-<p>这种情况，有两种原因：第一就是子查询没有返回值，第二就是子查询返回了值，但是在外查询中无法查询到。</p>
-<h3 id="多行子查询"><a href="#多行子查询" class="headerlink" title="多行子查询"></a>多行子查询</h3><p>子查询要想返回多行，需要使用多行比较符：<br>IN 等于列表中的任何成员<br>ANY 比较子查询返回的每个值<br>ALL 比较子查询返回的全部值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Employee_Id, Last_Name, Job_Id, Salary</div><div class="line"><span class="keyword">From</span> Employees</div><div class="line"><span class="keyword">Where</span> Salary &lt; All (<span class="keyword">Select</span> Salary <span class="keyword">From</span> Employees <span class="keyword">Where</span> Job_Id = <span class="string">'IT_PROG'</span>)</div><div class="line"><span class="keyword">And</span> Job_Id &lt;&gt; <span class="string">'IT_PROG'</span>;</div></pre></td></tr></table></figure>
-<p>本例的意思是查询公司中薪水小于所有工种为IT_PROG的员工薪水的人的员工号、姓名、工种、薪水，其实就是小于该工种最小薪水的人。</p>
-<p>上个例子和any的差别是一个是返回的要小于所有的，一个是返回小于一个就可以了，和至少，至多类似。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/子查询6/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/从多表中查询数据4" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="从多表中查询数据"><a href="#从多表中查询数据" class="headerlink" title="从多表中查询数据"></a>从多表中查询数据</h1><p>我们需要查询来自多表的数据。但是数据显示了来自单独的两个表的数据，两个表又有一样的。怎么将两个表合并成一个表。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> e.Employee_Id, e.Last_Name, d.Department_Id, 						d.Department_Name</div><div class="line"><span class="keyword">From</span> Employees e, Departments d</div><div class="line"><span class="keyword">Where</span> e.Department_Id = d.Department_Id;</div></pre></td></tr></table></figure>
-<ol>
-<li><h2 id="有效连接条件与笛卡儿积"><a href="#有效连接条件与笛卡儿积" class="headerlink" title="有效连接条件与笛卡儿积"></a>有效连接条件与笛卡儿积</h2><p>当一个连接条件无效或被遗漏时，其结果是一个笛卡尔乘积 (Cartesian product)，其中所有行的组合都被显示。第一个表中的所有行连接到第二个表中的所有行。 一个笛卡尔乘积会产生大量的行，其结果没有什么用。你应该在 WHERE 子句中始终包含一个有效的连接条件，除非你有特殊的需求，需要从所有表中组合所有的行。</p>
-<h6 id="例如"><a href="#例如" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> e.Employee_Id, e.Last_Name, e.Department_Id <span class="keyword">From</span> Employees e;</div><div class="line">……</div><div class="line">107行</div><div class="line"><span class="keyword">Select</span> d.Department_Id, d.Department_Name, d.Location_Id <span class="keyword">From</span> Departments d;</div><div class="line">……</div><div class="line">27行</div><div class="line"><span class="keyword">Select</span> * <span class="keyword">From</span> Departments, Employees;</div><div class="line">……</div><div class="line">2889行</div></pre></td></tr></table></figure>
-</li>
-<li><h2 id="连接类型"><a href="#连接类型" class="headerlink" title="连接类型"></a>连接类型</h2><p>EQUJION等值连接，NON-EQUJION 非等值连接，Outer join 外连接，Self join 自连接。外连接分为：左外连接，右外连接，全外连接。</p>
-</li>
-<li><h2 id="表连接的原则"><a href="#表连接的原则" class="headerlink" title="表连接的原则"></a>表连接的原则</h2><p>在写一个连接表的 SELECT 语句时，在列名前面用表名可以使语义清楚，并且加快数据库访问。如果相同的列名出现在多个表中，列名必须前缀表名。为了连接 n 个表在一起，你最少需要 n-1 个连接条件。从多个表中显示数据，在WHERE 子句中写一个简单的连接条件。</p>
-</li>
-<li><h2 id="等值连接"><a href="#等值连接" class="headerlink" title="等值连接"></a>等值连接</h2><p>等值连接是使用最多的一种连接方式。<br>连接条件是两个表的某些列相等</p>
-<p>除了使用必须的等值条件之外，还可以使用AND来附加条件</p>
-</li>
-<li><h2 id="等值连接中的列别名、表别名"><a href="#等值连接中的列别名、表别名" class="headerlink" title="等值连接中的列别名、表别名"></a>等值连接中的列别名、表别名</h2><p>如果列名在两个表之间不相同，就不需要限定列。但是，使用表前缀可以改善性能，因为你确切地告诉 Oracle 服务器在那里找到列。<br>必须限定不明确的列名也适用于在其它子句中可能引起混淆的那些列，例如 SELECT 子句或 ORDER BY 子句。</p>
-<p>表别名的使用原则：</p>
-<p>​    表别名最多可以有 30 个字符，但短一些更好。</p>
-<p>​    如果在 FROM 子句中表别名被用于指定的表，那么在整个 SELECT 语句中都                            要使用表别名。</p>
-<p>​    表别名应该是有意义的。</p>
-<p>​    表别名只对当前的 SELECT 语句有效。</p>
-<p>​    不能对不同的表使用相同的表别名，如果使用，则只对使用的第一个表起作用。</p>
-</li>
-<li><h2 id="多于两个表的等值连接"><a href="#多于两个表的等值连接" class="headerlink" title="多于两个表的等值连接"></a>多于两个表的等值连接</h2><p>为了连接n个表，你最少需要n-1个连接条件。例如，为了连接3个表，最少需要两个连接。</p>
-<h6 id="例如-1"><a href="#例如-1" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> e.Last_Name, d.Department_Name, l.City</div><div class="line"><span class="keyword">From</span> Employees e, Departments d, Locations l</div><div class="line"><span class="keyword">Where</span> e.Department_Id = d.Department_Id</div><div class="line"><span class="keyword">And</span> d.Location_Id = l.Location_Id;</div></pre></td></tr></table></figure>
-</li>
-<li><h2 id="非等值连接"><a href="#非等值连接" class="headerlink" title="非等值连接"></a>非等值连接</h2><p>EMPLOYEES 表和JOBS A 表之间的关系有一个非等值连接例子。在两个表之间的关系是EMPLOYEES 表中的SALARY 列必须是JOBS 表的NIN_SALARY 和MAX_SALARY 列之间的值。使用不同于等于(=) 的操作符获得关系。</p>
-<h6 id="例如-2"><a href="#例如-2" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> e.Last_Name, e.Salary, j.Job_Title</div><div class="line"><span class="keyword">From</span> Employees e, Jobs j</div><div class="line"><span class="keyword">Where</span> e.Salary <span class="keyword">Between</span> j.Min_Salary <span class="keyword">And</span> j.Max_Salary;</div></pre></td></tr></table></figure>
-<p>ps：也可以写成：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> e.Last_Name, e.Salary, j.Job_Title</div><div class="line"><span class="keyword">From</span> Employees e, Jobs j</div><div class="line"><span class="keyword">Where</span> e.Salary &gt;= j.Min_Salary <span class="keyword">And</span> e.salary &lt;= j.Max_Salary;</div></pre></td></tr></table></figure>
-</li>
-<li><h2 id="外连接"><a href="#外连接" class="headerlink" title="外连接"></a>外连接</h2><p>普通的连接被称为内连接。</p>
-<p>内连接的特点是如果一个行不满足连接条件，该行将不出现在查询结果中。<br>使用外连接，不满足连接条件的行也会在输出结果中。</p>
-<p>​</p>
-<p>为了看到这个员工的信息，我们需要使用外连接。外连接运算符是加号(+)。你可以用一个外连接查看那些不满足连接条件的行。</p>
-<h6 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h6><p>显示TABLE2中不满足条件的行。（左外连接）</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> table1.column, table2.column</div><div class="line"><span class="keyword">FROM</span> table1, table2</div><div class="line"><span class="keyword">WHERE</span> table1.column(+)=table2.column;</div><div class="line"></div><div class="line"><span class="keyword">Select</span> e.Last_Name, e.Department_Id, d.Department_Name</div><div class="line"><span class="keyword">From</span> Employees e</div><div class="line"><span class="keyword">Left</span> <span class="keyword">Outer</span> <span class="keyword">Join</span> Departments d <span class="keyword">On</span> (e.Department_Id = d.Department_Id);</div></pre></td></tr></table></figure>
-<p>无法进行这样的连接。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> table1.column, table2.column</div><div class="line"><span class="keyword">FROM</span> table1, table2</div><div class="line"><span class="keyword">WHERE</span> table1.column(+) = table2.column(+);</div></pre></td></tr></table></figure>
-<p>全外连接如下实现：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> table1.column, table2.column</div><div class="line"><span class="keyword">FROM</span> table1 <span class="keyword">full</span> <span class="keyword">outer</span> <span class="keyword">join</span> table2</div><div class="line"><span class="keyword">On</span> (table1.column = table2.column);</div><div class="line"></div><div class="line"><span class="keyword">Select</span> e.Last_Name, e.Department_Id, d.Department_Name</div><div class="line"><span class="keyword">From</span> Employees e</div><div class="line"><span class="keyword">Full</span> <span class="keyword">Outer</span> <span class="keyword">Join</span> Departments d <span class="keyword">On</span> (e.Department_Id = d.Department_Id);</div></pre></td></tr></table></figure>
-</li>
-<li><p>自连接</p>
-<p>自连接就是连接的两个表均来自于同一个列<br>自连接是一种使用很少的连接形式<br>自连接可以是等值或非等值的连接</p>
-<p>例如，为了找到 Whalen 的经理的名字，你需要：<br>在 EMPLOYEES 的 LAST_NAME 列找到 Whalen。<br>在 MANAGER_ID 列找到 Whalen 的经理号。Whalen 的经理号是 101。<br>用 EMPLOYEE_ID 101 在 LAST_NAME 列找到经理的名字。Kochhar 的雇员号是 101，所以 Kochhar 是 Whalen 的经理。<br>在这个过程中，你要查找表两次，第一次你在 LAST_NAME 列中查找 Whalen 并且在找到对应的 MANAGER_ID 列的值 101。第二次你在 EMPLOYEE_ID 列查找 101 并且在 LAST_NAME 列找到 Kochhar。每个经理同时也是雇员。</p>
-<h6 id="例如-3"><a href="#例如-3" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> w.Last_Name || <span class="string">' works for '</span> || m.Last_Name</div><div class="line"><span class="keyword">From</span> Employees w, Employees m</div><div class="line"><span class="keyword">Where</span> w.Manager_Id = m.Employee_Id;</div></pre></td></tr></table></figure>
-</li>
-<li><h2 id="SQL1999连接语法介绍"><a href="#SQL1999连接语法介绍" class="headerlink" title="SQL1999连接语法介绍"></a>SQL1999连接语法介绍</h2><p>自然连接等价于等值连接，前提是两个表有相同名称的列</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Department_Id, Department_Name, Location_Id, City</div><div class="line"><span class="keyword">From</span> Departments <span class="keyword">Natural</span></div><div class="line"><span class="keyword">Join</span> Locations;</div></pre></td></tr></table></figure>
-<p>如果列名称相同，但是列类型不同，会报错。可以使用USING子句来处理这种情况。自然连接(Natural joins) 用具有相匹配的名字和数据类型的所有列来连接表。USING 子句可以被用来指定那些将被用语一个等值连接的列中的唯一列。在USING 子句中引用的列不应该在SQL 语句的任何地方用表名或表别名限制(前缀)。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> e.Employee_Id, e.Last_Name, d.Location_Id</div><div class="line"><span class="keyword">From</span> Employees e</div><div class="line"><span class="keyword">Join</span> Departments d</div><div class="line"><span class="keyword">Using</span> (Department_Id);</div></pre></td></tr></table></figure>
-<p>对于自然连接的连接条件，基本上是带有相同名字的所有列的等值连接，为了指定任意条件，或者指定要连接的列，可以使用ON 子句连接条件从另一个搜索条件中被分开，ON 子句使得代码易懂。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> e.Employee_Id,</div><div class="line">	e.Last_Name,</div><div class="line">	e.Department_Id,</div><div class="line">	d.Department_Id,</div><div class="line">	d.Location_Id</div><div class="line"><span class="keyword">From</span> Employees e</div><div class="line"><span class="keyword">Join</span> Departments d <span class="keyword">On</span> (e.Department_Id = d.Department_Id);</div></pre></td></tr></table></figure>
-<p>​</p>
-</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/从多表中查询数据4/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/sql的单行函数3" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="sql的单行函数"><a href="#sql的单行函数" class="headerlink" title="sql的单行函数"></a>sql的单行函数</h1><p>执行数据计算，修改单个数据项，操纵输出进行行分组，格式化显示的日期和数字，转换列数据类型。<br>SQL函数有输入参数，并且总有一个返回值。</p>
-<h2 id="SQL函数分为：单行函数和多行函数"><a href="#SQL函数分为：单行函数和多行函数" class="headerlink" title="SQL函数分为：单行函数和多行函数"></a>SQL函数分为：单行函数和多行函数</h2><p><strong>单行函数</strong>：这些函数仅对单个行进行运算，并且每行返回一个结果。有不同类型的单行函数，本章下面的函数类型：字符、数字、日期、转换<br><strong>多行函数</strong>：这些函数能够操纵成组的行，每个行组给出一个结果，这些函数也被称为组函数。</p>
-<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>function_name[(arg1，arg2….)]</p>
-<h5 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h5><p>function_name 是函数的名字。<br>arg1, arg2 是由函数使用的任意参数，可以由一个列名或者一个表达式提供。</p>
-<h5 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h5><p>作用于查询中返回的每一行、每行返回一个结果、可能返回一个与参数不同类型的数据值、可能需要一个或多个参数、能够用在SELECT、WHERE和ORDER BY子句中、可以嵌套<br>| 函数   | 接受和返回类型                                  |<br>| —- | —————————————- |<br>| 字符函数 | 接受字符输入，可以返回字符或者数字值                       |<br>| 数字函数 | 接受数字输入，返回数字值                             |<br>| 日期函数 | 对DATE数据类型的值进行运算(除了MONTHS_BETWEEN函数返回一个数字，所有日期函数都返回一个DATE数据类型的值。) |<br>| 转换函数 | 从一个数据类型到另一个数据类型转换一个值                     |<br>| 通用函数 | NVL,NVL2,NULLIF,COALSECE,CASE,DECODE     |</p>
-<h3 id="字符函数"><a href="#字符函数" class="headerlink" title="字符函数"></a>字符函数</h3><p>字符函数包括：大小写处理函数和字符处理函数</p>
-<h5 id="大小写处理函数"><a href="#大小写处理函数" class="headerlink" title="大小写处理函数"></a>大小写处理函数</h5><ol>
-<li><p>LOWER(c) 将指定字符串内字符变为小写</p>
-<h6 id="例如"><a href="#例如" class="headerlink" title="例如"></a>例如</h6><p>Select Lower(‘WhaT is tHis’) From Dual;</p>
-</li>
-<li><p>UPPER(c) 将指定字符串内字符变为大写</p>
-</li>
-<li>INITCAP(c) 将字符串中单词的第一个字母转换为大写，其它则转换为小写</li>
-</ol>
-<h5 id="字符处理函数"><a href="#字符处理函数" class="headerlink" title="字符处理函数"></a>字符处理函数</h5><p><strong>1. CONCAT(c1,c2) 连接字符串</strong></p>
-<h6 id="例如-1"><a href="#例如-1" class="headerlink" title="例如"></a>例如</h6><p>​    Select Concat(‘aa’, ‘bb’) From Dual;</p>
-<p><strong>2. SUBSTR(c1,n1[,n2]) 截取指定长度的字符串</strong><br>​    n1=开始长度；<br>​    n2=截取的字符串长度，如果为空，默认截取到字符串结尾；<br>​    如果n1=0 then n1=1<br>​    如果n1&gt;0，则oracle从左向右确认起始位置截取<br>​    如果n1<0，则oracle从右向左数确认起始位置 ​="" 如果n1="">c1.length则返回空</0，则oracle从右向左数确认起始位置></p>
-<h6 id="例如-2"><a href="#例如-2" class="headerlink" title="例如"></a>例如</h6><p>​    Select Substr(‘What is this’, 5, 3) From Dual;</p>
-<p><strong>3. LENGTH(c) 返回指定字符串的长度</strong></p>
-<h6 id="例如-3"><a href="#例如-3" class="headerlink" title="例如"></a>例如</h6><p>​    Select Length(‘A123中’) From Dual;</p>
-<p><strong>4. INSTR(c1,c2[,n1[,n2]]) 返回c2在c1中位置</strong><br>​    c1:原字符串<br>​    c2:要寻找的字符串<br>​    n1:查询起始位置，正值表示从左到右，负值表示从右到左 (大小表示位置,比如3表                                     </p>
-<p>​    示左面第3处开始,-3表示右面第3处开始)。如果为0的话，则返回的也是0                                     </p>
-<p>​    n2:第几个匹配项。大于0</p>
-<h6 id="例如-4"><a href="#例如-4" class="headerlink" title="例如"></a>例如</h6><p>​    Select Instr(‘abcdefg’, ‘e’, -3) From Dual;</p>
-<p><strong>5. LPAD(c1,n[,c2]) 返回指定长度=n的字符串</strong><br>​    如果n<c1.length则从右到左截取指定长度返回； ​="" 如果n="">c1.length and c2 is null，以空格从左向右补充字符长度至n并返回；<br>​    如果n&gt;c1.length and c2 is not null，以指定字符c2从左向右补充c1长度至n并返    回；</c1.length则从右到左截取指定长度返回；></p>
-<h6 id="例如-5"><a href="#例如-5" class="headerlink" title="例如"></a>例如</h6><p>​    Select Lpad(‘WhaT is tHis’, 5),<br>​          Lpad(‘WhaT is tHis’, 25),<br>​          Lpad(‘WhaT is tHis’, 25, ‘-‘)<br>​    From Dual;</p>
-<p><strong>6. RPAD(c1,n[,c2]) 返回指定长度=n的字符串</strong><br>​    基本与上同，不过补充字符是从右向左方向正好与上相反；</p>
-<p><strong>7. TRIM([[LEADING||TRAILING||BOTH] c2 FROM] c1)</strong><br>​    如果没有指定任何参数则oracle去除c1头尾空格<br>​    如果指定了c2参数，则oracle去掉c1头尾c2<br>​    如果指定了leading参数则会去掉c1头部c2<br>​    如果指定了trailing参数则会去掉c1尾部c2<br>​    如果指定了both参数则会去掉c1头尾c2</p>
-<p><strong>8. REPLACE(c1,c2[,c3]) 将c1字符串中的c2替换为c3，如果c3为空，则从c1中删除所有c2。</strong></p>
-<h3 id="数字函数"><a href="#数字函数" class="headerlink" title="数字函数"></a>数字函数</h3><p><strong>1. ROUND(n1[,n2]) 返回四舍五入小数点右边n2位后n1的值，n2缺省值为0，如果n2为负数就舍入到小数点左边相应的位上</strong></p>
-<p><strong>2. TRUNC(n1[,n2]) 返回截尾到n2位小数的n1的值，n2缺省设置为0，当n2为缺省设置时会将n1截尾为整数，如果n2为负值，就截尾在小数点左边相应的位上。</strong></p>
-<h6 id="例如-6"><a href="#例如-6" class="headerlink" title="例如"></a>例如</h6><p>​    Select Trunc(23.56), Trunc(23.56, 1), Trunc(23.56, -1) From Dual;</p>
-<p><strong>3. MOD(n1,n2) 返回n1除n2的余数，如果n2=0则返回n1的值。</strong></p>
-<h3 id="系统时间"><a href="#系统时间" class="headerlink" title="系统时间"></a>系统时间</h3><p>​    CURRENT_DATE 返回当前session所在时区的默认时间</p>
-<h6 id="例如-7"><a href="#例如-7" class="headerlink" title="例如"></a>例如</h6><p>​    select current_date from dual;<br>​    SYS3DATE 功能与上相同，返回当前session所在时区的默认时间。<br>​    如果同时使用sysdate与curren t_date获得的时间不一定相同，某些情况下    </p>
-<p>​    current_date会比sysdate快一秒。</p>
-<h6 id="例如-8"><a href="#例如-8" class="headerlink" title="例如"></a>例如</h6><p>​    Select Sysdate, Current_Date From Dual;</p>
-<h3 id="用日期计算"><a href="#用日期计算" class="headerlink" title="用日期计算"></a>用日期计算</h3><p>从日期加或者减一个数，结果是一个日期值，两个日期相减，得到两个日期之间的天数，用小时数除以24，可以加小时到日期上。<br>|        运算        |  结果  |      说明      |<br>| :————–: | :–: | :———-: |<br>|  date + number   |  日期  | 加一个天数到一个日期上  |<br>|  date - number   |  日期  | 从一个日期上减一个天数  |<br>|   date - date    |  天数  | 用一个日期减另一个日期  |<br>| date + number/24 |  日期  | 加一个小时数到一个日期上 |</p>
-<h3 id="时间函数"><a href="#时间函数" class="headerlink" title="时间函数"></a>时间函数</h3><p>MONTHS_BETWEEN(d1,d2) 返回d1与d2间的月份差，视d1,d2的值大小，结果可正可负，当然也有可能为0<br>ADD_MONTHS() 返回指定日期月份+n之后的值，n可以为任何整数。</p>
-<h6 id="例如-9"><a href="#例如-9" class="headerlink" title="例如"></a>例如</h6><p>​    Select Add_Months(Sysdate, 12), Add_Months(Sysdate, -12) From Dual;</p>
-<p><strong>NEXT_DAY(d,n) 返回指定日期后第一个n的日期，n为一周中的某一天</strong></p>
-<p><strong>LAST_DAY(d) 返回指定时间所在月的最后一天</strong></p>
-<p><strong>ROUND(d[,fmt])</strong> 前面讲数值型函数的时候介绍过ROUND，此处与上功能基本相似，不过此处操作的是日期。如果不指定fmt参数，则默认返回距离指定日期最近的日期。</p>
-<p><strong>TRUNC(d[,fmt])</strong> 与前面介绍的数值型TRUNC原理相同，不过此处也是操作的日期型。</p>
-<h3 id="转换函数"><a href="#转换函数" class="headerlink" title="转换函数"></a>转换函数</h3><h4 id="隐式数据类型转换"><a href="#隐式数据类型转换" class="headerlink" title="隐式数据类型转换"></a>隐式数据类型转换</h4><p>对于直接赋值，ORACLE SQL可以进行以下的隐式转换：<br>| 从                | 到        |<br>| —————- | ——– |<br>| VARCHAR2 or CHAR | NUMBER   |<br>| VARCHAR2 or CHAR | DATE     |<br>| NUMBER           | VARCHAR2 |<br>| DATE             | VARCHAR2 |<br>对于表达式赋值，ORACLE SQL可以进行以下的隐式转换：<br>| 从                | 到      |<br>| —————- | —— |<br>| VARCHAR2 or CHAR | NUMBER |<br>| VARCHAR2 or CHAR | DATE   |</p>
-<h4 id="显式数据类型转换"><a href="#显式数据类型转换" class="headerlink" title="显式数据类型转换"></a>显式数据类型转换</h4><p>转换字符-&gt;字符TO_CHAR(c)：将nchar,nvarchar2,clob,nclob类型转换为char类型；</p>
-<h6 id="例如-10"><a href="#例如-10" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> To_Char(<span class="string">'AABBCC'</span>) <span class="keyword">From</span> Dual;</div></pre></td></tr></table></figure>
-<p>转换时间-&gt;字符TO_CHAR(d[,fmt])：将指定的时间(data, timestamp, timestamp with time zone)按照指定格式转换为varchar2类型；</p>
-<h6 id="例如-11"><a href="#例如-11" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> To_Char(<span class="keyword">Sysdate</span>, <span class="string">'yyyy-mm-dd hh24:mi:ss'</span>) <span class="keyword">From</span> Dual;</div></pre></td></tr></table></figure>
-<p>转换数值-&gt;字符TO_CHAR(n[,fmt])：将指定数值n按照指定格式fmt转换为varchar2类型并返回；</p>
-<h6 id="例如-12"><a href="#例如-12" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> To_Char(<span class="number">-100</span>, <span class="string">'L99G999D99MI'</span>) <span class="keyword">From</span> Dual;</div></pre></td></tr></table></figure>
-<p>TO_DATE(c[,fmt[,nls]]) 将char,nchar,varchar2,nvarchar2转换为日期类型，如果fmt参数<br>不为空，则按照fmt中指定格式进行转换。注意这里的fmt参数。如果ftm为’J’则表示按照公元制(Julian day)转换，c则必须为大于0并小于5373484的正整数。</p>
-<h6 id="例如-13"><a href="#例如-13" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> <span class="keyword">To_Date</span>(<span class="number">2454336</span>, <span class="string">'J'</span>) <span class="keyword">From</span> Dual;</div><div class="line"><span class="keyword">Select</span> <span class="keyword">To_Date</span>(<span class="string">'2007-8-23 23:25:00'</span>, <span class="string">'yyyy-mm-dd hh24:mi:ss'</span>) <span class="keyword">From</span> Dual;</div></pre></td></tr></table></figure>
-<p>TO_NUMBER(c[,fmt[,nls]]) 将char,nchar,varchar2,nvarchar2型字串按照fmt中指定格式转换为数值类型并返回。</p>
-<h6 id="例如-14"><a href="#例如-14" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> To_Number(<span class="string">'-100.00'</span>, <span class="string">'9G999D99'</span>) <span class="keyword">From</span> Dual;</div></pre></td></tr></table></figure>
-<h4 id="日期格式模板"><a href="#日期格式模板" class="headerlink" title="日期格式模板"></a>日期格式模板</h4><table>
-<thead>
-<tr>
-<th style="text-align:center">YYYY</th>
-<th style="text-align:center">数字全写年</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">YEAR</td>
-<td style="text-align:center">年的拼写</td>
-</tr>
-<tr>
-<td style="text-align:center">MM</td>
-<td style="text-align:center">月的两数字值</td>
-</tr>
-<tr>
-<td style="text-align:center">MONTH</td>
-<td style="text-align:center">月的全名</td>
-</tr>
-<tr>
-<td style="text-align:center">MON</td>
-<td style="text-align:center">月的三字母缩写</td>
-</tr>
-<tr>
-<td style="text-align:center">DY</td>
-<td style="text-align:center">周中天的三字母缩写</td>
-</tr>
-<tr>
-<td style="text-align:center">DAY</td>
-<td style="text-align:center">周中天的全名</td>
-</tr>
-<tr>
-<td style="text-align:center">DD</td>
-<td style="text-align:center">月的数字天</td>
-</tr>
-</tbody>
-</table>
-<h4 id="时间格式模板"><a href="#时间格式模板" class="headerlink" title="时间格式模板"></a>时间格式模板</h4><table>
-<thead>
-<tr>
-<th style="text-align:left">元素</th>
-<th style="text-align:left">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">AM或PM</td>
-<td style="text-align:left">正午指示</td>
-</tr>
-<tr>
-<td style="text-align:left">A.M.或P.M.</td>
-<td style="text-align:left">带句点的正午指示</td>
-</tr>
-<tr>
-<td style="text-align:left">HH或HH12或HH24</td>
-<td style="text-align:left">天的小时，或小时(1–12)，或小时(0–23)</td>
-</tr>
-<tr>
-<td style="text-align:left">MI</td>
-<td style="text-align:left">分钟 (0–59)</td>
-</tr>
-<tr>
-<td style="text-align:left">SS</td>
-<td style="text-align:left">秒 (0–59)</td>
-</tr>
-<tr>
-<td style="text-align:left">SSSSS</td>
-<td style="text-align:left">午夜之后的秒 (0–86399)</td>
-</tr>
-</tbody>
-</table>
-<p>数字格式模板</p>
-<table>
-<thead>
-<tr>
-<th>9</th>
-<th>表示一个数</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>强制显示为零</td>
-</tr>
-<tr>
-<td>$</td>
-<td>放置一个浮动美元符号</td>
-</tr>
-<tr>
-<td>L</td>
-<td>使用浮动本地货币符号</td>
-</tr>
-<tr>
-<td>.</td>
-<td>打印一个小数点</td>
-</tr>
-<tr>
-<td>,</td>
-<td>打印一个千位指示</td>
-</tr>
-<tr>
-<td>MI</td>
-<td>右边减号 (负值)</td>
-</tr>
-<tr>
-<td>PR</td>
-<td>将负数加上括号</td>
-</tr>
-<tr>
-<td>EEEE</td>
-<td>科学计数法 (格式化必须指定四个E)</td>
-</tr>
-<tr>
-<td>V</td>
-<td>乘10，n次 (n = V 后面 9 的个数)</td>
-</tr>
-<tr>
-<td>B</td>
-<td>将0显示为空格</td>
-</tr>
-</tbody>
-</table>
-<h2 id="单层函数可以嵌套"><a href="#单层函数可以嵌套" class="headerlink" title="单层函数可以嵌套"></a>单层函数可以嵌套</h2><p>单行函数能够被嵌套任意层次，嵌套函数的计算是从最里层到最外层。</p>
-<h2 id="通用函数"><a href="#通用函数" class="headerlink" title="通用函数"></a>通用函数</h2><p>NVL(c1,c2) 逻辑等价于IF c1 is null THEN c2 ELSE c1 END。c1,c2可以是任何类型。如果两者类型不同，则oracle会自动将c2转换为c1的类型。</p>
-<p>NVL2(c1,c2,c3) 大家可能都用到nvl，但你用过nvl2吗？如果c1非空则返回c2,如果c1为空则返回c3</p>
-<p>NULLIF(c1,c2)。逻辑等价于：CASE WHEN c1 = c2 THEN NULL ELSE c1END</p>
-<p>COALESCE(n1,n2,….n) 返回序列中的第一个非空值</p>
-<h6 id="例如-15"><a href="#例如-15" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> <span class="keyword">Coalesce</span>(<span class="literal">Null</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="literal">Null</span>, <span class="number">9</span>) <span class="keyword">From</span> Dual;</div></pre></td></tr></table></figure>
-<h2 id="条件表达式"><a href="#条件表达式" class="headerlink" title="条件表达式"></a>条件表达式</h2><p>CASE的表达的语法</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">ENDCASE expr</div><div class="line">WHEN comparison_expr1THEN return_expr1</div><div class="line">[WHEN comparison_expr2 THENreturn_expr2</div><div class="line">WHEN comparison_exprn</div><div class="line">THEN</div><div class="line">return_exprn ELSE else_expr]</div><div class="line"><span class="keyword">END</span></div></pre></td></tr></table></figure>
-<h6 id="例如-16"><a href="#例如-16" class="headerlink" title="例如"></a>例如</h6><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">Select</span> Last_Name,</div><div class="line">	   	Job_Id,</div><div class="line">	   	Salary,</div><div class="line">		<span class="keyword">Case</span> Job_Id</div><div class="line">			<span class="keyword">When</span> <span class="string">'IT_PROG'</span> <span class="keyword">Then</span></div><div class="line">				<span class="number">1.10</span> * Salary</div><div class="line">			<span class="keyword">When</span> <span class="string">'ST_CLERK'</span> <span class="keyword">Then</span></div><div class="line">				<span class="number">1.15</span> * Salary</div><div class="line">			<span class="keyword">When</span> <span class="string">'SA_REP'</span> <span class="keyword">Then</span></div><div class="line">				<span class="number">1.20</span> * Salary</div><div class="line">			<span class="keyword">Else</span>	</div><div class="line">				Salary	</div><div class="line">		<span class="keyword">End</span> <span class="string">"REVISED_SALARY"</span></div><div class="line"><span class="keyword">From</span> Employees;</div></pre></td></tr></table></figure>
-<h2 id="Decode函数"><a href="#Decode函数" class="headerlink" title="Decode函数"></a>Decode函数</h2><p>这是个oracle独有的函数</p>
-<h4 id="定义-1"><a href="#定义-1" class="headerlink" title="定义"></a>定义</h4><p>​    DECODE(exp,s1,r1,s2,r2..s,r[,def]) 可以把它理解成一个增强型的if else，只不过它并不通过多行语句，而是在一个函数内实现if else的功能。<br>exp做为初始参数。s做为对比值，相同则返回r，如果s有多个，则持续遍历所有s，直到某个条件为真为止，否则返回默认值def(如果指定了的话)，如果没有默认值，并且前面的对比也都没有为真，则返回空。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">Salary,</div><div class="line">Decode(Trunc(Salary / 2000, 0),</div><div class="line">		0,</div><div class="line">		0.00,</div><div class="line">		1,</div><div class="line">		0.09,	</div><div class="line">		2,</div><div class="line">		0.20,</div><div class="line">		3,	</div><div class="line">		0.30,	</div><div class="line">		4,</div><div class="line">		0.40,</div><div class="line">		5,</div><div class="line">		0.42,</div><div class="line">		6,</div><div class="line">		0.44,</div><div class="line">		0.45) Tax_Rate</div><div class="line">From Employees</div><div class="line">Where Department_Id = 80;</div></pre></td></tr></table></figure>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/sql的单行函数3/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-sql/sql的SELECT语句1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-sql/sql的SELECT语句1" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
     <div class="article-entry" itemprop="articleBody">
@@ -1018,54 +173,26 @@
       
 
       
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/sql/sql的SELECT语句1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-  
-    <article id="post-hello-world" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/18/hello-world/">Hello World</a>
-    </h1>
-  
-
-        
-        <a href="/2017/06/18/hello-world/" class="archive-article-date">
-  	<time datetime="2017-06-17T19:51:53.559Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-06-18</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
       
     </div>
     <div class="article-info article-info-index">
@@ -1074,22 +201,94 @@
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/06/18/hello-world/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/06/18/sql/sql的SELECT语句1/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
 
+  
+<nav id="article-nav">
+  
+    <a href="/2017/06/18/sql/sql的单行函数3/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/06/18/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hello World</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 
 
 
   
+  
+  
+
+  
+
   
 
 
@@ -1112,8 +311,8 @@
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
