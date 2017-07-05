@@ -6,7 +6,6 @@ categories: code-style
 ---
 # <center>代码规范<center/>
 ***
-## 文件预处理
 
 1. 每个源文件都对应一个头文件（XX .cpp  与  XX.h)
 
